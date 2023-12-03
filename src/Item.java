@@ -38,4 +38,9 @@ public class Item {
 	public void setConservation (int conservation) {
 		this.conservation = conservation;
 	}
+	
+	@Override
+	public String toString() {
+		return name + ", " + type + ", " + price + "€";
+	}
 }

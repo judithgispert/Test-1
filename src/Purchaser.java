@@ -24,4 +24,8 @@ public class Purchaser {
 		return purchaserItems;
 	}
 
+	@Override
+	public String toString() {
+		return name + ", " + city;
+	}
 }

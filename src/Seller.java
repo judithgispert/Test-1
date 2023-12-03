@@ -1,3 +1,4 @@
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -6,13 +7,13 @@ public abstract class Seller {
 	private String name;
 	private String city;
 	protected int maxItems;
-	private List <Item> itemsList;
+	private List <Item> inventory;
 	
 	public Seller (String name, String city) {
 		this.name = name;
 		this.city = city;
+		inventory = new ArrayList <Item>();
 		maxItems = 0;
-		itemsList = new ArrayList <Item>();
 	}
 	
 	
@@ -22,11 +23,11 @@ public abstract class Seller {
 	public String getCity() {
 		return city;
 	}
+	public List<Item> getInventory() {
+		return inventory;
+	}
 	public int getMaxItems() {
 		return maxItems;
-	}
-	public List<Item> getItemsList() {
-		return itemsList;
 	}
 	
 	
@@ -36,20 +37,19 @@ public abstract class Seller {
 	public void setCity (String city) {
 		this.city = city;
 	}
-	public void setItem(List<Item> itemsList) {
-		this.itemsList = itemsList;
+	public void setItem(List<Item> inventory) {
+		this.inventory = inventory;
 	}
+	
+	
+	public abstract double totalPrice(double price);
 
+	public abstract int wearItem (Item item);
 	
-	
-	public double itemTaxes(double price) {
-		double totalPrice = price;
-		return totalPrice;
-	}
 	
 	@Override
 	public String toString() {
-		return name + ", " + city + "maximum items: " + maxItems;
+		return name + ", " + city;
 	}
 	
 	

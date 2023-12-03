@@ -4,24 +4,9 @@ import java.util.Scanner;
 import java.util.stream.Collectors;
 
 
-
 public class Menu {
-
-	public void menuApp() {
-		System.out.println("Application menu: \r\n" 
-							+ "1. Create new seller. \r\n" 
-							+ "2. Add item to seller. \r\n" 
-							+ "3. Shows the cheapest item in a city.\r\n"
-							+ "4. Check a seller's items. \r\n"
-							+ "5. Create purchaser. \r\n"
-							+ "6. Shop item. \r\n"
-							+ "7. Show purchaser items. \r\n"
-							+ "8. Consult all the sellers in a city. \r\n"
-							+ "9. Consult all the purchasers in a city. \r\n"
-							+ "0. Exit app.");	
-	}
 	
-	public void app() throws ExceptionItem {
+	public void app(){
 		boolean exit = true;
 		List<Seller> sellersList = new ArrayList <Seller>();
 		List<Purchaser> purchaserList = new ArrayList <Purchaser>();
@@ -38,7 +23,11 @@ public class Menu {
 					break;
 				
 				case 2:
-					addItem(sellersList);
+					try {
+						addItem(sellersList);
+					} catch (ExceptionFullInventory ex) {
+						ex.getMessage();
+					}
 					exit = false;
 					break;
 				
@@ -86,6 +75,20 @@ public class Menu {
 	}
 	
 	
+	public void menuApp() {
+		System.out.println("Application menu: \r\n" 
+							+ "1. Create new seller. \r\n" 
+							+ "2. Add item to seller. \r\n" 
+							+ "3. Shows the cheapest item in a city.\r\n"
+							+ "4. Check a seller's items. \r\n"
+							+ "5. Create purchaser. \r\n"
+							+ "6. Shop item. \r\n"
+							+ "7. Show purchaser items. \r\n"
+							+ "8. Consult all the sellers in a city. \r\n"
+							+ "9. Consult all the purchasers in a city. \r\n"
+							+ "10. Show items of a type sorted by ascending price. \r\n"
+							+ "0. Exit app.");	
+	}
 	
 	
 	static int getInt (String missatge) {
@@ -105,9 +108,8 @@ public class Menu {
 	}
 	
 	
-	
 	public static void createFarmer (String name, String city, List<Seller> sellersList) {
-		sellersList.add(new Farmer(name, city));
+		sellersList.add(new Farmer(name, city));	
 	}
 	public static void createThief (String name, String city, List<Seller> sellersList) {
 		sellersList.add(new Thief(name, city));
@@ -116,8 +118,8 @@ public class Menu {
 		sellersList.add(new Merchant(name, city));
 	}
 	
+	
 	public static void createSeller(List<Seller> sellersList) {
-		
 		System.out.println("1. Create new Farmer. \r\n" 
 				+ "2. Create new Thief. \r\n" 
 				+ "3. Create new Merchant.\r\n");	
@@ -139,6 +141,7 @@ public class Menu {
 		purchaserList.add(new Purchaser(getString("Name:"), getString("City:")));
 	}
 	
+	
 	public static int getSeller(List<Seller> sellersList) {
 		String nameSeller = getString("Write the name of the seller:");
 
@@ -151,6 +154,7 @@ public class Menu {
 		}
 		return nameFound;
 	}
+	
 	
 	public static int getPurchaser (List <Purchaser> purchaserList) {
 		String namePurchaser = getString("Write the name of the purchaser:");
@@ -165,30 +169,28 @@ public class Menu {
 		return nameFound;
 	}
 	
-	public static void addItem(List<Seller> sellersList) throws ExceptionItem{
+	
+	public static void addItem(List<Seller> sellersList) throws ExceptionFullInventory{
 		int found = getSeller(sellersList);
 		
 		if (found != -1) {
-			if (sellersList.get(found).getItemsList().size() >= sellersList.get(found).getMaxItems()) {
-				throw new ExceptionItem();
+			if (sellersList.get(found).getInventory().size() >= sellersList.get(found).getMaxItems()) {
+				throw new  ExceptionFullInventory("Inventory full! - The seller cannot buy the item");
 			}
-			sellersList.get(found).getItemsList().add(new Item (getString("Item name:"), getString("Item type:"), getDouble("Item price:")));
+			Item item = new Item (getString("Item name:"), getString("Item type:"), getDouble("Item price:"));
+			item.setPrice(sellersList.get(found).totalPrice(item.getPrice()));
+			item.setConservation(sellersList.get(found).wearItem(item));
+			sellersList.get(found).getInventory().add(item);
 		} else {
-			System.out.println("Seller not found");
+			System.out.println("Seller not found.");
 		}
 	}
 	
-	/*public static void cheapestItem (List<Seller> sellersList) {
-		String nameCity = getString("Write the name of the city:");
-		
-		sellersList.stream().filter(l -> l.getCity().contains(nameCity)).filter(l -> l.getItemsList()).mapToDouble(l -> l).min()
-		
-	}*/
 	
 	public static void sellerItems(List<Seller> sellersList) {
 		int numSeller = getSeller(sellersList);
 		
-		sellersList.get(numSeller).getItemsList().stream().forEach(l -> System.out.println(l.getName()));
+		sellersList.get(numSeller).getInventory().stream().forEach(l -> System.out.println(l.getName()));
 	}
 	
 	public static void purchaserItems(List<Purchaser> purchaserList) {
